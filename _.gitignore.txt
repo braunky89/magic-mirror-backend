@@ -1,0 +1,18 @@
+# 🔒 SECRETS (Most Important!)
+.env
+api_keys.txt
+
+# 🐍 PYTHON CLUTTER
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# 💻 OPERATING SYSTEM TRASH
+.DS_Store
+Thumbs.db
+
+# 🧪 TEST UPLOADS
+temp_images/
+user_selfie_debug.jpg
