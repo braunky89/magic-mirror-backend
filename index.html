@@ -1,124 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Magic Mirror Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boutique Magic Mirror Demo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
-        }
-        .btn-glow { animation: pulse-glow 2s infinite; }
-    </script>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f0f0f0; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        .btn { background: #6d28d9; color: white; padding: 15px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; }
+        .hidden { display: none; }
+        img { width: 100%; border-radius: 10px; margin-top: 10px; }
+        #loading { color: #6d28d9; font-weight: bold; margin: 20px 0; }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body>
+
+    <div class="card">
+        <h1>Lumière Atelier</h1>
+        <p>Emerald Silk Dress - $189</p>
         
-<div class="p-10 text-center">
-    <h1 class="text-2xl font-bold">Magic Mirror Demo</h1>
-    <p>If you see this, the site is working! Just wait for the images to load.</p>
-</div>
-    <div class="max-w-md mx-auto min-h-screen bg-white shadow-lg overflow-hidden relative">
-        <div class="p-4 border-b flex justify-between items-center">
-            <span class="font-bold text-xl tracking-tight">LUMIÈRE ATELIER</span>
-            <button class="text-gray-400">✕</button>
+        <img src="https://images.unsplash.com/photo-1539109136881-3be0610917c1?w=400" alt="Dress">
+
+        <button id="tryBtn" class="btn" onclick="startDemo()">✨ Try it on You</button>
+
+        <div id="loading" class="hidden">
+            <p id="statusText">Analyzing silhouette...</p>
         </div>
 
-        <img src="https://images.unsplash.com/photo-1539109136881-3be0610917c1?auto=format&fit=crop&w=800" class="w-full h-96 object-cover" alt="Green Dress">
-
-        <div class="p-6">
-            <h1 class="text-2xl font-medium text-gray-800">Emerald Silk Wrap Dress</h1>
-            <p class="text-xl text-gray-600 mt-1">$189.00</p>
-            
-            <button onclick="openMirror()" class="btn-glow mt-6 w-full py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-full font-semibold flex justify-center items-center gap-2 transition-transform active:scale-95">
-                <span>✨</span> Try it on You
-            </button>
-
-            <button class="mt-3 w-full py-4 border-2 border-gray-800 text-gray-800 rounded-full font-semibold">
-                Add to Cart
-            </button>
-        </div>
-
-        <div id="mirror-overlay" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-4 transition-opacity duration-300">
-            <div class="glass-effect w-full max-w-sm rounded-3xl p-6 shadow-2xl transition-transform duration-300 translate-y-full" id="mirror-modal">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Virtual Try-On</h3>
-                    <button onclick="closeMirror()" class="text-gray-500 text-2xl">✕</button>
-                </div>
-
-                <div id="input-state">
-                    <div class="border-2 border-dashed border-violet-300 rounded-2xl p-8 text-center bg-violet-50/50">
-                        <div class="text-4xl mb-4">📸</div>
-                        <p class="text-sm text-gray-600 mb-4">Upload a selfie to see how this dress looks on you instantly.</p>
-                        <button onclick="startProcessing()" class="w-full py-3 bg-violet-600 text-white rounded-xl font-medium">Upload Photo</button>
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-4 text-center">Pro-Tip: Stand in bright lighting for the best results.</p>
-                </div>
-
-                <div id="processing-state" class="hidden text-center py-10">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-violet-600 border-t-transparent mb-4"></div>
-                    <p id="loading-text" class="text-violet-600 font-medium animate-pulse">Analyzing silhouette...</p>
-                </div>
-
-                <div id="result-state" class="hidden">
-                    <img id="result-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800" class="w-full h-80 object-cover rounded-2xl mb-4 shadow-inner" alt="Result">
-                    <button class="w-full py-4 bg-violet-600 text-white rounded-full font-bold shadow-lg shadow-violet-200">
-                        Add to Cart - Looks Great!
-                    </button>
-                </div>
-            </div>
+        <div id="result" class="hidden">
+            <h3>Your AI Fitting:</h3>
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400" alt="Result">
+            <button class="btn" style="background: #10b981;">Looks Great! Add to Cart</button>
         </div>
     </div>
 
     <script>
-        function openMirror() {
-            const overlay = document.getElementById('mirror-overlay');
-            const modal = document.getElementById('mirror-modal');
-            overlay.classList.remove('hidden');
-            setTimeout(() => modal.classList.remove('translate-y-full'), 10);
-        }
+        function startDemo() {
+            // Hide button, show loading
+            document.getElementById('tryBtn').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
 
-        function closeMirror() {
-            const overlay = document.getElementById('mirror-overlay');
-            const modal = document.getElementById('mirror-modal');
-            modal.classList.add('translate-y-full');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
-        }
+            const steps = ["Analyzing silhouette...", "Draping fabric...", "Finalizing look..."];
+            let currentStep = 0;
 
-        function startProcessing() {
-            document.getElementById('input-state').classList.add('hidden');
-            document.getElementById('processing-state').classList.remove('hidden');
-            
-            const messages = [
-                "Analyzing silhouette...",
-                "Draping fabric...",
-                "Matching lighting...",
-                "Finalizing your look!"
-            ];
-            
-            let i = 0;
-            const interval = setInterval(() => {
-                i++;
-                if(i < messages.length) {
-                    document.getElementById('loading-text').innerText = messages[i];
+            const timer = setInterval(() => {
+                currentStep++;
+                if (currentStep < steps.length) {
+                    document.getElementById('statusText').innerText = steps[currentStep];
                 } else {
-                    clearInterval(interval);
-                    showResult();
+                    clearInterval(timer);
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('result').classList.remove('hidden');
                 }
             }, 1500);
         }
-
-        function showResult() {
-            document.getElementById('processing-state').classList.add('hidden');
-            document.getElementById('result-state').classList.remove('hidden');
-        }
     </script>
+
 </body>
 </html>
